@@ -2,13 +2,27 @@ import axiosClient from "../../api/axiosClient"
 
 
 class BoardAPI {
-  endPoints = {
-    getAll: '/boards'
-  }
+  endPoint = '/boards';
+  // endPoints = {
+  //   getAll: '/boards',
+  //   post: '/boards'
+  // }
 
   getAllBoards = async () => {
-    const response = await axiosClient.get(this.endPoints.getAll);
+    const response = await axiosClient.get(this.endPoint);
     return response.data.response.boards;
+  }
+
+  addBoard = async (boardData: { name: string }) => {
+    const { name } = boardData;
+    // console.log({name});
+    const response = await axiosClient.post(this.endPoint, { name });
+    // return response.data.response.board;
+  }
+
+  deleteBoard = async (id: string) => {
+    const response = await axiosClient.delete(`${this.endPoint}/${id}`);
+    // return response.data.response.board;
   }
 }
 
