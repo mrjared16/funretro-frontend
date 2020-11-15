@@ -1,10 +1,15 @@
+
 import React from 'react';
+import { Route, Switch } from 'react-router-dom';
+import { Board } from '../features/Board';
 
 function App() {
   return (
-    <div className="App">
-      'hello world'
-    </div>
+    <Switch>
+      <Route path='/boards'>
+        <Board />
+      </Route>
+    </Switch>
   );
 }
 
