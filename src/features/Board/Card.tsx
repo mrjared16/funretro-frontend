@@ -1,74 +1,76 @@
 import { Box, Button, makeStyles, TextField, Typography } from '@material-ui/core';
 import React, { useState } from 'react'
-import { cardAPI } from './cardAPI';
+import { Card as CardUI } from '@material-ui/core';
 
 interface Props {
   name: string,
-  id: string,
+  id?: string,
+  startMode?: CardMode,
   onDelete: () => void,
-  onSave: () => void
+  onSave: (cardData: { name: string }) => void
 }
 
 const useStyle = makeStyles({
   card: {
-    margin: '5px',
+    margin: '10px 5px',
     padding: '5px',
     backgroundColor: 'white',
   }
 })
-type CardMode = 'view' | 'add' | 'edit';
-export const Card: React.FC<Props> = ({ name: cardName, id, onDelete }: Props) => {
+
+type CardMode = 'view' | 'edit';
+export const Card: React.FC<Props> = ({ name: cardName, id, onDelete, onSave, startMode = 'view' }: Props) => {
   const classes = useStyle();
-  const [mode, setMode] = useState<CardMode>('view');
+  const [mode, setMode] = useState<CardMode>(startMode);
   const [name, setName] = useState(cardName);
 
-  const onEdit = () => {
+  const showEditView = () => {
     setMode('edit');
   }
-  const onAdd = () => {
-    setMode('add');
-  }
-  const onView = () => {
+
+  const showDefaultView = () => {
     setMode('view');
   }
-  const onSave = () => {
-    onView();
+  const handleSave = () => {
+    onSave({ name });
+    showDefaultView();
   }
 
   const handleChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
     setName(e.target.value);
   }
   return (<>
-    {
-      mode == 'view' &&
-      <Box display='flex' alignItems='center' justifyContent='center' className={classes.card}>
-        <Box flexGrow={1}>
-          <Typography>
-            {name}
-          </Typography>
-
-        </Box>
-        <Box>
-          <Box>
-            <Button onClick={() => onEdit()}>Edit</Button>
-          </Box>
-        </Box>
-      </Box>
-    }
-    {
-      (mode == 'edit' || mode == 'add') &&
-      <Box display='flex' flexDirection='column' className={classes.card}>
-        <Box>
-          <TextField fullWidth value={name} onChange={handleChange} />
-        </Box>
-        <Box display='flex' alignItems='center' justifyContent='center'>
+    <CardUI className={classes.card}>
+      {
+        mode == 'view' &&
+        <Box display='flex' justifyContent='center' >
           <Box flexGrow={1}>
-            <Button onClick={() => onSave()}>Save</Button>
+            <Typography>
+              {name}
+            </Typography>
           </Box>
-          <Button onClick={() => onDelete()}>Delete</Button>
+          <Box>
+            <Box>
+              <Button onClick={() => showEditView()}>Edit</Button>
+            </Box>
+          </Box>
         </Box>
-      </Box>
-    }
+      }
+      {
+        (mode == 'edit') &&
+        <Box display='flex' flexDirection='column'>
+          <Box>
+            <TextField fullWidth value={name} onChange={handleChange} />
+          </Box>
+          <Box display='flex' alignItems='center' justifyContent='center'>
+            <Box flexGrow={1}>
+              <Button onClick={() => handleSave()}>Save</Button>
+            </Box>
+            <Button onClick={() => onDelete()}>Delete</Button>
+          </Box>
+        </Box>
+      }
+    </CardUI>
 
   </>
   )
