@@ -22,7 +22,7 @@ export const Board = (props: Props) => {
   let match = useRouteMatch();
   return (
     <>
-      <AppBar position="relative">
+      <AppBar position='fixed'>
         <Toolbar className={classes.header}>
           <Typography variant="h6" noWrap>
             <Link to='/'>

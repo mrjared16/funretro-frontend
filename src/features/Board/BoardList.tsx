@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { AppBar, Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, makeStyles, TextField, Toolbar, Typography } from '@material-ui/core';
-import { Link, useLocation, useRouteMatch } from 'react-router-dom';
-import { boardAPI } from './boardAPI';
+import { Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Link, useLocation } from 'react-router-dom';
+import { boardAPI } from './boardAPI';
 
 interface Props {
 
@@ -65,11 +65,11 @@ export const BoardList = (props: Props) => {
   const { handleSubmit, register, errors } = useForm();
   const onAddBoard = (data: { name: string }) => {
     const { name = 'default' } = data;
-    console.log({ name, data });
+    // console.log({ name, data });
     boardAPI.addBoard({ name }).then(handleClose);
   }
   const onDeleteBoard = (id: string) => () => {
-    console.log('delete board ' + id);
+    // console.log('delete board ' + id);
     boardAPI.deleteBoard(id);
   }
   const MyGrid: React.FC = ({ children }) => (

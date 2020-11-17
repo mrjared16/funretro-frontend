@@ -1,6 +1,6 @@
-import { Box, Button, Card as CardUI, Container, makeStyles, Typography } from '@material-ui/core'
-import React, { Suspense, useEffect, useMemo, useState } from 'react'
-import { boardAPI } from './boardAPI'
+import { Box, Button, Card as CardUI, Container, makeStyles, Typography } from '@material-ui/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { boardAPI } from './boardAPI';
 import { Card } from './Card';
 import { cardAPI } from './cardAPI';
 import { BoardDTO } from './interfaces/board.dto';
@@ -47,7 +47,6 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
   const [cards, setCards] = useState<CardDTO[]>([]);
 
   const cardDictionary = useMemo(() => {
-    // console.log('useMemo: ', { cards });
     return cards.reduce(
       (cardDictionary: Record<string, CardDTO[]>, currentCard) => {
         const idList = currentCard.idList;
@@ -67,7 +66,6 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
           cardDictionary[idList] = [{ ...currentCard }];
         }
 
-        console.log({ newMemo: { ...cardDictionary } })
         return cardDictionary;
       }, {})
   }, [lists, cards]);
@@ -85,7 +83,6 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
   }, []);
 
   const onAddCard = (idBoard: string, idList: string) => () => {
-    console.log('addCard');
     const name = 'New to do';
     const pos = 10;
     async function addCard() {

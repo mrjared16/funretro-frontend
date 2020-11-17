@@ -15,7 +15,7 @@ class BoardAPI {
 
   addBoard = async (boardData: { name: string }) => {
     const { name } = boardData;
-    // console.log({name});
+    // console.log({name})
     const response = await axiosClient.post(this.endPoint, { name });
     // return response.data.response.board;
   }
