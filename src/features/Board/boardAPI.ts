@@ -1,5 +1,5 @@
 import axiosClient from "../../api/axiosClient"
-
+import { BoardDetailDTO } from "./interfaces/board.dto";
 
 class BoardAPI {
   endPoint = '/boards';
@@ -23,6 +23,11 @@ class BoardAPI {
   deleteBoard = async (id: string) => {
     const response = await axiosClient.delete(`${this.endPoint}/${id}`);
     // return response.data.response.board;
+  }
+
+  getBoard = async (id: string): Promise<BoardDetailDTO> => {
+    const response = await axiosClient.get(`${this.endPoint}/${id}`);
+    return response.data.response.board;
   }
 }
 
