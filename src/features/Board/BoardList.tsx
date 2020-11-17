@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 export const BoardList = (props: Props) => {
   const [openAddBoardDialog, setOpenAddButtonDialog] = React.useState(false);
   const [boards, setBoards] = useState<{ id: string, name: string }[]>([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   let location = useLocation();
 
   useEffect(() => {
@@ -49,6 +49,7 @@ export const BoardList = (props: Props) => {
       const response = await boardAPI.getAllBoards();
       const boards: { id: string, name: string }[] = response;
       setBoards((prev) => boards);
+      setIsLoading(false);
     }
     getBoards();
   }, [])
@@ -79,64 +80,69 @@ export const BoardList = (props: Props) => {
 
   const classes = useStyles();
   return (
-    <Container className={classes.cardGrid}>
-      <Box className={classes.title}>
-        <Typography color='primary' variant='h2'>My boards</Typography>
-      </Box>
-      <Box>
-        <Grid container spacing={3}>
-          <MyGrid>
-            <Button variant='contained' color='secondary' onClick={() => handleClickOpen()}>Add new board</Button>
-          </MyGrid>
-          {
-            boards.map(({ id, name }) =>
-              (
-                <MyGrid key={id}>
-                  <Card className={classes.card}>
-                    <Link to={`${location.pathname}/${id}`} >
-                      <CardContent className={classes.cardContent}>
-                        <Typography color='textPrimary' variant='h6' className={classes.cardTitle}>{name}</Typography>
-                      </CardContent>
-                    </Link>
-                    <CardActions>
-                      <Button size="small" color='secondary'>Copy URL</Button>
-                      <Button size="small" variant='outlined' onClick={onDeleteBoard(id)}>Delete</Button>
-                    </CardActions>
-                  </Card>
-                </MyGrid>
-              ))
-          }
-        </Grid>
-      </Box>
+    <>
+      { isLoading
+        ? 'Loading'
+        : <Container className={classes.cardGrid}>
+          <Box className={classes.title}>
+            <Typography color='primary' variant='h2'>My boards</Typography>
+          </Box>
+          <Box>
+            <Grid container spacing={3}>
+              <MyGrid>
+                <Button variant='contained' color='secondary' onClick={() => handleClickOpen()}>Add new board</Button>
+              </MyGrid>
+              {
+                boards.map(({ id, name }) =>
+                  (
+                    <MyGrid key={id}>
+                      <Card className={classes.card}>
+                        <Link to={`${location.pathname}/${id}`} >
+                          <CardContent className={classes.cardContent}>
+                            <Typography color='textPrimary' variant='h6' className={classes.cardTitle}>{name}</Typography>
+                          </CardContent>
+                        </Link>
+                        <CardActions>
+                          <Button size="small" color='secondary'>Copy URL</Button>
+                          <Button size="small" variant='outlined' onClick={onDeleteBoard(id)}>Delete</Button>
+                        </CardActions>
+                      </Card>
+                    </MyGrid>
+                  ))
+              }
+            </Grid>
+          </Box>
 
-      <Dialog fullWidth open={openAddBoardDialog} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <form
-          onSubmit={handleSubmit(onAddBoard)}
-          noValidate
-        >
-          <DialogTitle id="form-dialog-title">Add board</DialogTitle>
-          <DialogContent className={classes.addButtonDialog}>
-            {/* <DialogContentText>
+          <Dialog fullWidth open={openAddBoardDialog} onClose={handleClose} aria-labelledby="form-dialog-title">
+            <form
+              onSubmit={handleSubmit(onAddBoard)}
+              noValidate
+            >
+              <DialogTitle id="form-dialog-title">Add board</DialogTitle>
+              <DialogContent className={classes.addButtonDialog}>
+                {/* <DialogContentText>
             To subscribe to this website, please enter your email address here. We will send updates
             occasionally.
             </DialogContentText> */}
-            <TextField
-              inputRef={register}
-              autoFocus
-              margin='dense'
-              id='name'
-              name='name'
-              label='Board name'
-              type='name'
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button variant='contained' color='primary' type='submit'>Add board</Button>
-            <Button variant='outlined' onClick={handleClose} color="primary"> Cancel </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </Container>
+                <TextField
+                  inputRef={register}
+                  autoFocus
+                  margin='dense'
+                  id='name'
+                  name='name'
+                  label='Board name'
+                  type='name'
+                  fullWidth
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button variant='contained' color='primary' type='submit'>Add board</Button>
+                <Button variant='outlined' onClick={handleClose} color="primary"> Cancel </Button>
+              </DialogActions>
+            </form>
+          </Dialog>
+        </Container>
+      }
+    </>
   )
 }
