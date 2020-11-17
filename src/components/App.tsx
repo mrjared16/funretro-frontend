@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { Board } from '../features/Board';
 
 function App() {
@@ -9,6 +9,7 @@ function App() {
       <Route path='/boards'>
         <Board />
       </Route>
+      <Redirect to='/boards' />
     </Switch>
   );
 }
