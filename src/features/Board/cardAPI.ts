@@ -12,9 +12,13 @@ class CardAPI {
     const response = await axiosClient.post(this.endPoint, { name, idBoard, idList, pos });
     return response.data.response.card;
   }
-
-  deleteCard = async (id: string) => {
-    const response = await axiosClient.delete(`${this.endPoint}/${id}`);
+  updateCard = async (idCard: string, cardData: { name: string }) => {
+    const { name } = cardData;
+    const response = await axiosClient.patch(`${this.endPoint}/${idCard}`, { name });
+    return response.data.response.card;
+  }
+  deleteCard = async (idCard: string) => {
+    const response = await axiosClient.delete(`${this.endPoint}/${idCard}`);
     // return response.data.response.card;
   }
 
