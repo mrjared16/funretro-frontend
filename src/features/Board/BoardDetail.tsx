@@ -6,6 +6,7 @@ import { cardAPI } from './cardAPI';
 import { BoardDTO } from './interfaces/board.dto';
 import { CardDTO } from './interfaces/card.dto';
 import { ListDTO } from './interfaces/list.dto';
+import { List } from './List';
 
 interface Props {
   id: string
@@ -17,31 +18,13 @@ const useStyle = makeStyles({
   },
   board: {
 
-  },
-  list: {
-    minWidth: '200px',
-    margin: '15px 4px',
-    '&:first-child': {
-      marginLeft: '8px'
-    }
-  },
-  listContainer: {
-    // backgroundColor: 'red'
-  },
-  listName: {
-    padding: '10px 8px',
-    '&>*': {
-      fontWeight: 'bold',
-      color: 'white'
-    }
-  },
-  cards: {
-    margin: '5px'
   }
 });
 
 export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
   const classes = useStyle();
+
+  const [isLoading, setIsLoading] = useState(true);
   const [board, setBoard] = useState<BoardDTO>();
   const [lists, setLists] = useState<ListDTO[]>([]);
   const [cards, setCards] = useState<CardDTO[]>([]);
@@ -56,9 +39,9 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
           const cardABeforeCardB = (a: CardDTO, b: CardDTO) => a.pos < b.pos;
 
           let i = 0;
-          while (i < cardList.length - 1 && !cardABeforeCardB(cardList[i], cardList[i + 1])) i++;
+          while (i < cardList.length && cardList[i].pos < currentCard.pos) i++;
 
-          const newCardList = [...cardList];
+          const newCardList = cardList.slice();
           newCardList.splice(i, 0, currentCard);
           cardDictionary[idList] = newCardList;
         }
@@ -69,7 +52,7 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
         return cardDictionary;
       }, {})
   }, [lists, cards]);
-  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     async function getBoard() {
       const { cards, lists, members, ...boardData } = await boardAPI.getBoard(idBoard);
@@ -82,9 +65,13 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
     getBoard();
   }, []);
 
-  const onAddCard = (idBoard: string, idList: string) => () => {
-    const name = 'New to do';
-    const pos = 10;
+  const handleAddCard = (idBoard: string, idList: string) => (cardData: { name: string }) => {
+    const { name } = cardData;
+    const BUFFER = 65353;
+    const maxPos = !!cardDictionary[idList]
+      ? cardDictionary[idList].reduce((max, cur) => cur.pos > max ? cur.pos : max, 0)
+      : 0;
+    const pos = maxPos + BUFFER;
     async function addCard() {
       const newCard: CardDTO = await cardAPI.addCard({ idBoard, idList, name, pos });
       setCards((prev) => [...prev, newCard]);
@@ -92,11 +79,23 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
     addCard();
   }
 
-  const onDeleteCard = (id: string) => () => {
+  const handleUpdateCard = (id: string) => (cardData: { name: string }) => {
+    const { name } = cardData;
+    cardAPI.updateCard(id, { name });
+    setCards((prev) => prev.map(card => {
+      if (card.id == id) {
+        return { ...card, ...cardData }
+      }
+      return card;
+    }));
+  }
+
+  const handleDeleteCard = (id: string) => () => {
     cardAPI.deleteCard(id);
     const newCards = cards.filter(card => card.id != id);
     setCards((prev) => newCards);
   }
+
   return (
     <>
       { isLoading
@@ -109,33 +108,16 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
           </Box>
           <Box display='flex' flexWrap='noWrap' className={classes.board}>
             {
-              lists.map(({ name: listName, id: idList, color }) => (
-                <Box flexGrow={1} key={idList} className={classes.list}>
-                  <CardUI className={classes.listContainer} style={{ backgroundColor: `#${color}` }} >
-                    <Box className={classes.listName}>
-                      <Typography color='inherit'>
-                        {listName}
-                      </Typography>
-                    </Box>
-                    <Box className={classes.cards}>
-                      {
-                        !!cardDictionary[idList] && cardDictionary[idList].map(({ name: cardName, id: idCard }) =>
-                          <Card
-                            key={idCard}
-                            name={cardName}
-                            id={idCard}
-                            onDelete={onDeleteCard(idCard)}
-                            onSave={() => { }} />
-                        )
-                      }
-                    </Box>
-                    <Box>
-                      <Button fullWidth onClick={onAddCard(idBoard, idList)}>Add new card</Button>
-                      {/* <Button onClick={() => onAddCard(idBoard, idList)}>Create new card</Button> */}
-                    </Box>
-                  </CardUI>
-                </Box>
-              ))
+              lists.map((list) =>
+                <List
+                  key={list.id}
+                  cards={cardDictionary[list.id]}
+                  {...list}
+                  onAddCard={handleAddCard}
+                  onUpdateCard={handleUpdateCard}
+                  onDeleteCard={handleDeleteCard}
+                />
+              )
             }
           </Box>
         </Container>
