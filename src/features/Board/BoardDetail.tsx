@@ -1,4 +1,4 @@
-import { Box, Button, Card as CardUI, Container, makeStyles, Typography } from '@material-ui/core';
+import { Box, Button, Card as CardUI, Container, makeStyles, TextField, Typography } from '@material-ui/core';
 import React, { useEffect, useMemo, useState } from 'react';
 import { boardAPI } from './boardAPI';
 import { Card } from './Card';
@@ -9,7 +9,7 @@ import { ListDTO } from './interfaces/list.dto';
 import { List } from './List';
 
 interface Props {
-  id: string
+  id: string;
 }
 
 const useStyle = makeStyles({
@@ -18,6 +18,9 @@ const useStyle = makeStyles({
   },
   board: {
 
+  },
+  boardName: {
+    marginRight: '10px'
   }
 });
 
@@ -36,7 +39,6 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
 
         if (cardDictionary[idList]) {
           const cardList: CardDTO[] = cardDictionary[idList];
-          const cardABeforeCardB = (a: CardDTO, b: CardDTO) => a.pos < b.pos;
 
           let i = 0;
           while (i < cardList.length && cardList[i].pos < currentCard.pos) i++;
@@ -96,15 +98,46 @@ export const BoardDetail: React.FC<Props> = ({ id: idBoard }: Props) => {
     setCards((prev) => newCards);
   }
 
+  const [boardName, setBoardName] = useState('');
+  useEffect(() => {
+    setBoardName(!!board ? board?.name : '')
+  }, [board])
+  const [canChangeName, setCanChangeName] = useState(false);
+  const handleModifyBoardNameState: ((event: React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
+    setBoardName(e.target.value);
+    // setBoard((prev) => ({ !!prev && ...prev }))
+  }
+  const handleChangeBoardName = () => {
+    setCanChangeName(false);
+    async function updateBoard() {
+      await boardAPI.updateBoard(idBoard, { name: boardName });
+      setBoard((prev) => ({ ...(prev as BoardDTO), name: boardName }));
+    }
+    updateBoard();
+  }
   return (
     <>
       { isLoading
         ? 'Loading'
         : <Container>
-          <Box className={classes.header}>
-            <Typography color='textPrimary' variant='h6'>
-              {board?.name}
-            </Typography>
+          <Box display='flex' className={classes.header}>
+            <Box flexGrow={1}>
+              {!canChangeName
+                ? <Box display='flex'>
+                  <Typography color='textPrimary' variant='h6' className={classes.boardName}>
+                    {boardName}
+                  </Typography>
+                  <Button size='small' variant='outlined' onClick={() => setCanChangeName(true)}>Edit</Button>
+                </Box>
+                : <Box display='flex'>
+                  <TextField className={classes.boardName} autoFocus value={boardName} onChange={handleModifyBoardNameState} />
+                  <Button size='small' variant='outlined' onClick={() => handleChangeBoardName()}>Save</Button>
+                </Box>
+              }
+            </Box>
+            <Box>
+              <Button color='primary' variant='contained'>Copy URL</Button>
+            </Box>
           </Box>
           <Box display='flex' flexWrap='noWrap' className={classes.board}>
             {

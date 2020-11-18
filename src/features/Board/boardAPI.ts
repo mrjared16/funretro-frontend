@@ -29,6 +29,11 @@ class BoardAPI {
     const response = await axiosClient.get(`${this.endPoint}/${id}`);
     return response.data.response.board;
   }
+
+  updateBoard = async (id: string, boardData: { name: string }) => {
+    const { name } = boardData;
+    const response = await axiosClient.patch(`${this.endPoint}/${id}`, { name })
+  }
 }
 
 const boardAPI = new BoardAPI();
