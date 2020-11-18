@@ -36,7 +36,7 @@ const SignUp: React.FC<{}> = ({ }) => {
   const classes = useStyles();
   const history = useHistory();
   const { handleSubmit, register, errors } = useForm();
-  const [serverError, setServerError] = useState(null);
+  const [serverError, setServerError] = useState('');
   const onSignUp = (userData: { email: string, password: string, name: string }) => {
     const { email, password, name } = userData;
     async function signUp() {
@@ -64,7 +64,7 @@ const SignUp: React.FC<{}> = ({ }) => {
         </Typography>
         <form onSubmit={handleSubmit(onSignUp)} className={classes.form} noValidate>
           <Grid container spacing={2}>
-            {serverError &&
+            {serverError.length > 0 &&
               <FormHelperText error variant='filled' margin='dense'>
                 <Typography variant='body1'>{serverError}</Typography>
               </FormHelperText>

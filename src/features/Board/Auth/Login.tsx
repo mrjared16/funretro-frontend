@@ -1,6 +1,6 @@
-import { Avatar, Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
+import { Avatar, Button, Container, CssBaseline, FormHelperText, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
 import { LockOutlined } from '@material-ui/icons';
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { authAPI } from "./authAPI";
@@ -32,16 +32,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 // template from https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/
-export default function Login() {
+const Login: React.FC<{}> = ({ }) => {
   const classes = useStyles();
   const history = useHistory();
   const { handleSubmit, register, errors } = useForm();
+  const [serverError, setServerError] = useState('');
   const onLogin = (userData: { email: string, password: string }) => {
     const { email, password } = userData;
     async function login() {
-      const accessToken = await authAPI.login(email, password)
-      localStorage.setItem('token', accessToken);
-      history.push('/');
+      try {
+        const accessToken = await authAPI.login(email, password)
+        localStorage.setItem('token', accessToken);
+        history.push('/');
+      } catch (e) {
+        const { message = 'Error' } = e;
+        setServerError((prev) => message);
+      }
     }
     login();
   }
@@ -57,6 +63,11 @@ export default function Login() {
           Login
         </Typography>
         <form onSubmit={handleSubmit(onLogin)} className={classes.form} noValidate>
+          {serverError.length > 0 &&
+            <FormHelperText error variant='filled' margin='dense'>
+              <Typography variant='body1'>{serverError}</Typography>
+            </FormHelperText>
+          }
           <TextField
             inputRef={register}
             variant="outlined"
@@ -109,3 +120,5 @@ export default function Login() {
     </Container>
   );
 }
+
+export default Login;
