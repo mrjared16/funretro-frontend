@@ -41,14 +41,16 @@ const useStyles = makeStyles((theme) => ({
 
 export const BoardList = (props: Props) => {
   const [openAddBoardDialog, setOpenAddButtonDialog] = React.useState(false);
-  const [boards, setBoards] = useState<{ id: string, name: string }[]>([]);
+  const [boards, setBoards] = useState<BoardDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { handleSubmit, register, errors } = useForm();
+  const history = useHistory();
   let location = useLocation();
 
   useEffect(() => {
     const getBoards = async () => {
       const response = await boardAPI.getAllBoards();
-      const boards: { id: string, name: string }[] = response;
+      const boards: BoardDTO[] = response;
       setBoards((prev) => boards);
       setIsLoading(false);
     }
@@ -63,8 +65,6 @@ export const BoardList = (props: Props) => {
     setOpenAddButtonDialog(false);
   };
 
-  const { handleSubmit, register, errors } = useForm();
-  const history = useHistory();
   const onAddBoard = (data: { name: string }) => {
     const { name = 'Default board name' } = data;
     // console.log({ name, data });
@@ -75,10 +75,16 @@ export const BoardList = (props: Props) => {
     }
     addBoard();
   }
+
   const onDeleteBoard = (id: string) => () => {
     // console.log('delete board ' + id);
-    boardAPI.deleteBoard(id);
+    async function deleteBoard() {
+      await boardAPI.deleteBoard(id);
+      setBoards((prev) => prev.filter(board => board.id != id));
+    }
+    deleteBoard();
   }
+
   const MyGrid: React.FC = ({ children }) => (
     <Grid item lg={2} md={3} sm={4} xs={6}>
       {children}
