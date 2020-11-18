@@ -2,7 +2,10 @@ import axiosClient from "../../../api/axiosClient";
 
 class AuthAPI {
   endPoint = '/auth';
-
+  login = async (email: string, password: string) => {
+    const response = await axiosClient.post(`${this.endPoint}/login`, { email, password });
+    return response.data.response.access_token;
+  }
   // addCard = async (cardData: { name: string, idBoard: string, idList: string, pos: number }) => {
   //   const { name, idBoard, idList, pos } = cardData;
   //   const response = await axiosClient.post(this.endPoint, { name, idBoard, idList, pos });

@@ -1,7 +1,9 @@
 import { Avatar, Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
 import { LockOutlined } from '@material-ui/icons';
 import React from "react";
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, useHistory } from "react-router-dom";
+import { authAPI } from "./authAPI";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,6 +34,17 @@ const useStyles = makeStyles((theme) => ({
 // template from https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-in/
 export default function Login() {
   const classes = useStyles();
+  const history = useHistory();
+  const { handleSubmit, register, errors } = useForm();
+  const onLogin = (userData: { email: string, password: string }) => {
+    const { email, password } = userData;
+    async function login() {
+      const accessToken = await authAPI.login(email, password)
+      localStorage.setItem('token', accessToken);
+      history.push('/');
+    }
+    login();
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -43,8 +56,9 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        <form className={classes.form} noValidate>
+        <form onSubmit={handleSubmit(onLogin)} className={classes.form} noValidate>
           <TextField
+            inputRef={register}
             variant="outlined"
             margin="normal"
             required
@@ -56,6 +70,7 @@ export default function Login() {
             autoFocus
           />
           <TextField
+            inputRef={register}
             variant="outlined"
             margin="normal"
             required
