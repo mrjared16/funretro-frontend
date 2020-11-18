@@ -4,6 +4,7 @@ import { Card } from './Card';
 import { CardDTO } from './interfaces/card.dto';
 
 interface Props {
+  idBoard: string;
   id: string;
   name: string;
   color: string;
@@ -27,9 +28,11 @@ const useStyle = makeStyles({
   },
   listContainer: {
     // backgroundColor: 'red'
+    paddingBottom: '10px'
   },
   listName: {
-    padding: '10px 8px',
+    margin: '5px',
+    padding: '5px 10px 0 10px',
     '&>*': {
       fontWeight: 'bold',
       color: 'white'
@@ -37,12 +40,24 @@ const useStyle = makeStyles({
   },
   cards: {
     margin: '5px'
+  },
+  addButton: {
+    margin: '10px'
+  },
+  listContent: {
+    '& > *': {
+      padding: '5px 10px'
+    }
   }
 });
 
-export const List: React.FC<Props> = ({ cards = [], id, name, color, onDeleteCard, onUpdateCard, onAddCard }: Props) => {
+export const List: React.FC<Props> = ({ cards = [], id, name, color, onDeleteCard, onUpdateCard, onAddCard, idBoard }: Props) => {
   const classes = useStyle();
   const [addMode, setAddMode] = useState(false);
+
+  const handleSave = () => {
+    onAddCard('', id)
+  }
   return (
     <Box flexGrow={1} className={classes.list}>
       <CardUI className={classes.listContainer} style={{ backgroundColor: `#${color}` }} >
@@ -51,7 +66,7 @@ export const List: React.FC<Props> = ({ cards = [], id, name, color, onDeleteCar
             {name}
           </Typography>
         </Box>
-        <Box className={classes.cards}>
+        <Box className={classes.listContent} display='flex' flexDirection='column' justifyContent='space-between' >
           {
             cards.map(({ name: cardName, id: idCard }) =>
               <Card
@@ -62,11 +77,16 @@ export const List: React.FC<Props> = ({ cards = [], id, name, color, onDeleteCar
                 onSave={onUpdateCard(idCard)} />
             )
           }
-        </Box>
-        <Box>
           {addMode
-            ? <Card name={''} startMode='edit' onDelete={() => { setAddMode(false) }} onSave={onAddCard('', id)} />
-            : <Button fullWidth onClick={() => setAddMode(true)}>Add new card</Button>
+            ? <Card name={''}
+              startMode='edit'
+              onDelete={() => { setAddMode(false) }}
+              onSave={onAddCard(idBoard, id)}
+              afterSave={() => setAddMode(false)}
+            />
+            : <Box>
+              <Button variant='contained' fullWidth onClick={() => setAddMode(true)}>Add new card</Button>
+            </Box>
           }
         </Box>
       </CardUI>

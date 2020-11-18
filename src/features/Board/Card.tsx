@@ -7,19 +7,30 @@ interface Props {
   id?: string,
   startMode?: CardMode,
   onDelete: () => void,
-  onSave: (cardData: { name: string }) => void
+  onSave: (cardData: { name: string }) => void,
+  afterSave?: () => void
 }
 
 const useStyle = makeStyles({
   card: {
-    margin: '10px 5px',
-    padding: '5px',
+    margin: '5px 10px',
+    // padding: '5px',
     backgroundColor: 'white',
+  },
+  editMode: {
+    '& > *': {
+      marginBottom: '5px',
+      '&:last-child': {
+        marginBottom: '0'
+      }
+    }
+    // paddingBottom: '5px',
+    // marginBottom: '5px'
   }
 })
 
 type CardMode = 'view' | 'edit';
-export const Card: React.FC<Props> = ({ name: cardName, id, onDelete, onSave, startMode = 'view' }: Props) => {
+export const Card: React.FC<Props> = ({ name: cardName, id, onDelete, afterSave, onSave, startMode = 'view' }: Props) => {
   const classes = useStyle();
   const [mode, setMode] = useState<CardMode>(startMode);
   const [name, setName] = useState(cardName);
@@ -33,7 +44,10 @@ export const Card: React.FC<Props> = ({ name: cardName, id, onDelete, onSave, st
   }
   const handleSave = () => {
     onSave({ name });
-    showDefaultView();
+    if (afterSave)
+      afterSave();
+    else
+      showDefaultView();
   }
 
   const handleChange: ((event: React.ChangeEvent<HTMLInputElement>) => void) = (e) => {
@@ -50,23 +64,21 @@ export const Card: React.FC<Props> = ({ name: cardName, id, onDelete, onSave, st
             </Typography>
           </Box>
           <Box>
-            <Box>
-              <Button onClick={() => showEditView()}>Edit</Button>
-            </Box>
+            <Button size='small' variant='outlined' onClick={() => showEditView()}>Edit</Button>
           </Box>
         </Box>
       }
       {
         (mode == 'edit') &&
-        <Box display='flex' flexDirection='column'>
-          <Box>
-            <TextField fullWidth value={name} onChange={handleChange} />
+        <Box className={classes.editMode} display='flex' flexDirection='column'>
+          <Box >
+            <TextField autoFocus fullWidth value={name} onChange={handleChange} />
           </Box>
-          <Box display='flex' alignItems='center' justifyContent='center'>
+          <Box display='flex'>
             <Box flexGrow={1}>
-              <Button onClick={() => handleSave()}>Save</Button>
+              <Button size='small' variant='outlined' onClick={() => handleSave()}>Save</Button>
             </Box>
-            <Button onClick={() => onDelete()}>Delete</Button>
+            <Button size='small' variant='outlined' onClick={() => onDelete()}>Delete</Button>
           </Box>
         </Box>
       }
