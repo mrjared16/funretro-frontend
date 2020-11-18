@@ -1,6 +1,6 @@
-import { AppBar, makeStyles, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Box, Button, makeStyles, Toolbar, Typography } from '@material-ui/core';
 import React from 'react';
-import { Link, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Link, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { BoardDetail } from './BoardDetail';
 import { BoardList } from './BoardList';
 
@@ -20,15 +20,27 @@ const useStyle = makeStyles({
 export const Board = (props: Props) => {
   const classes = useStyle();
   let match = useRouteMatch();
+  const history = useHistory();
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    history.push('/')
+  }
   return (
     <>
       <AppBar position='fixed'>
         <Toolbar className={classes.header}>
-          <Typography variant="h6" noWrap>
-            <Link to='/'>
-              FunRetro Clone
-          </Link>
-          </Typography>
+          <Box style={{ width: '100%' }} display='flex' >
+            <Box flexGrow={1}>
+              <Typography variant="h6" noWrap>
+                <Link to='/'>
+                  FunRetro Clone
+                </Link>
+              </Typography>
+            </Box>
+            <Box>
+              <Button variant='outlined' color='inherit' onClick={() => handleSignOut()}>Sign out</Button>
+            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
 
