@@ -32,7 +32,7 @@ export const Board = (props: Props) => {
         </Toolbar>
       </AppBar>
 
-      <main style={{marginTop: '64px' /**64px is min height of AppBar */}}>
+      <main style={{ marginTop: '64px' /**64px is min height of AppBar */ }}>
         <Switch>
           <Route
             path={`${match.path}/:boardId`}
