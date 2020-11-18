@@ -11,8 +11,7 @@ const axiosClient = axios.create({
   paramsSerializer: params => queryString.stringify(params)
 });
 
-const dummyToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3QxQGdtYWlsLmNvbSIsInVzZXJJZCI6IjgyZjRhOGU4LWU2NGYtNGI0Ni1iM2EzLWZlMjQ2NjNhNWIwOSIsImlhdCI6MTYwNTQ2Njk5N30.qHgZojK9IT6TWltv-TI6aTR3MPfhJSVk9rHFwaRyLKE';
-const getToken = () => dummyToken;
+const getToken = () => localStorage.getItem('token');
 
 axiosClient.interceptors.request.use(async (config) => {
   const token = getToken();

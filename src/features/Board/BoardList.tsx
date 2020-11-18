@@ -120,7 +120,7 @@ export const BoardList = (props: Props) => {
                         <CardActions >
                           <Box display='flex' style={{ width: '100%' }}>
                             <Box flexGrow={1}>
-                              <Button size="small" color='secondary'>Copy URL</Button>
+                              <Button size="small" variant='outlined' color='secondary'>Copy URL</Button>
                             </Box>
                             <Box>
                               <Button size="small" variant='outlined' onClick={onDeleteBoard(id)}>Delete</Button>
