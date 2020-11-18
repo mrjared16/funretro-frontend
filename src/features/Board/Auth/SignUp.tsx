@@ -1,6 +1,6 @@
-import { Avatar, Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
+import { Avatar, Button, Container, CssBaseline, FormHelperText, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
 import { LockOutlined } from '@material-ui/icons';
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useHistory } from "react-router-dom";
 import { authAPI } from "./authAPI";
@@ -36,6 +36,7 @@ const SignUp: React.FC<{}> = ({ }) => {
   const classes = useStyles();
   const history = useHistory();
   const { handleSubmit, register, errors } = useForm();
+  const [serverError, setServerError] = useState(null);
   const onSignUp = (userData: { email: string, password: string, name: string }) => {
     const { email, password, name } = userData;
     async function signUp() {
@@ -43,7 +44,9 @@ const SignUp: React.FC<{}> = ({ }) => {
         const response = await authAPI.signUp({ email, password, name });
         history.push('/login');
       } catch (e) {
-        console.log({ exception: e });
+        const { message = 'Error' } = e;
+        // console.log({ message });
+        setServerError((prev) => message);
       }
     }
     signUp();
@@ -61,6 +64,24 @@ const SignUp: React.FC<{}> = ({ }) => {
         </Typography>
         <form onSubmit={handleSubmit(onSignUp)} className={classes.form} noValidate>
           <Grid container spacing={2}>
+            {serverError &&
+              <FormHelperText error variant='filled' margin='dense'>
+                <Typography variant='body1'>{serverError}</Typography>
+              </FormHelperText>
+            }
+            <Grid item xs={12}>
+              <TextField
+                inputRef={register}
+                variant="outlined"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                type='email'
+                autoComplete="email"
+              />
+            </Grid>
             <Grid item xs={12}>
               <TextField
                 inputRef={register}
@@ -71,18 +92,6 @@ const SignUp: React.FC<{}> = ({ }) => {
                 label="Name"
                 name="name"
                 autoComplete="name"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                inputRef={register}
-                variant="outlined"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
               />
             </Grid>
             <Grid item xs={12}>
