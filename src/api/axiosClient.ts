@@ -1,8 +1,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
 
-const host = 'localhost:3001';
-const baseURL = `http://${host}`
+const baseURL = process.env.REACT_APP_API_URL;
 const axiosClient = axios.create({
   baseURL: baseURL,
   headers: {
