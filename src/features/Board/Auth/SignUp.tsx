@@ -1,7 +1,9 @@
 import { Avatar, Button, Container, CssBaseline, Grid, makeStyles, TextField, Typography } from "@material-ui/core";
 import { LockOutlined } from '@material-ui/icons';
 import React from "react";
-import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, useHistory } from "react-router-dom";
+import { authAPI } from "./authAPI";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,8 +32,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 //template from // template from https://github.com/mui-org/material-ui/blob/master/docs/src/pages/getting-started/templates/sign-up
-export default function SignUp() {
+const SignUp: React.FC<{}> = ({ }) => {
   const classes = useStyles();
+  const history = useHistory();
+  const { handleSubmit, register, errors } = useForm();
+  const onSignUp = (userData: { email: string, password: string, name: string }) => {
+    const { email, password, name } = userData;
+    async function signUp() {
+      try {
+        const response = await authAPI.signUp({ email, password, name });
+        history.push('/login');
+      } catch (e) {
+        console.log({ exception: e });
+      }
+    }
+    signUp();
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -43,10 +59,11 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form onSubmit={handleSubmit(onSignUp)} className={classes.form} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                inputRef={register}
                 variant="outlined"
                 required
                 fullWidth
@@ -58,6 +75,7 @@ export default function SignUp() {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                inputRef={register}
                 variant="outlined"
                 required
                 fullWidth
@@ -69,6 +87,7 @@ export default function SignUp() {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                inputRef={register}
                 variant="outlined"
                 required
                 fullWidth
@@ -103,3 +122,5 @@ export default function SignUp() {
     </Container>
   );
 }
+
+export default SignUp;
