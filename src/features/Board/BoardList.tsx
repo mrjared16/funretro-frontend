@@ -1,8 +1,9 @@
 import { Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, makeStyles, TextField, Typography } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { boardAPI } from './boardAPI';
+import { BoardDTO } from './interfaces/board.dto';
 
 interface Props {
 
@@ -63,10 +64,16 @@ export const BoardList = (props: Props) => {
   };
 
   const { handleSubmit, register, errors } = useForm();
+  const history = useHistory();
   const onAddBoard = (data: { name: string }) => {
-    const { name = 'default' } = data;
+    const { name = 'Default board name' } = data;
     // console.log({ name, data });
-    boardAPI.addBoard({ name }).then(handleClose);
+    async function addBoard() {
+      const board: BoardDTO = await boardAPI.addBoard({ name });
+      const { id } = board;
+      history.push(`/boards/${id}`);
+    }
+    addBoard();
   }
   const onDeleteBoard = (id: string) => () => {
     // console.log('delete board ' + id);
@@ -99,12 +106,20 @@ export const BoardList = (props: Props) => {
                       <Card className={classes.card}>
                         <Link to={`${location.pathname}/${id}`} >
                           <CardContent className={classes.cardContent}>
-                            <Typography color='textPrimary' variant='h6' className={classes.cardTitle}>{name}</Typography>
+                            <Typography color='textPrimary' variant='h6' className={classes.cardTitle}>
+                              {name.length > 23 ? name.substr(0, 20) + '...' : name}
+                            </Typography>
                           </CardContent>
                         </Link>
-                        <CardActions>
-                          <Button size="small" color='secondary'>Copy URL</Button>
-                          <Button size="small" variant='outlined' onClick={onDeleteBoard(id)}>Delete</Button>
+                        <CardActions >
+                          <Box display='flex' style={{ width: '100%' }}>
+                            <Box flexGrow={1}>
+                              <Button size="small" color='secondary'>Copy URL</Button>
+                            </Box>
+                            <Box>
+                              <Button size="small" variant='outlined' onClick={onDeleteBoard(id)}>Delete</Button>
+                            </Box>
+                          </Box>
                         </CardActions>
                       </Card>
                     </MyGrid>

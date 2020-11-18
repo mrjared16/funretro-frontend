@@ -17,7 +17,7 @@ class BoardAPI {
     const { name } = boardData;
     // console.log({name})
     const response = await axiosClient.post(this.endPoint, { name });
-    // return response.data.response.board;
+    return response.data.response.board;
   }
 
   deleteBoard = async (id: string) => {
@@ -32,7 +32,8 @@ class BoardAPI {
 
   updateBoard = async (id: string, boardData: { name: string }) => {
     const { name } = boardData;
-    const response = await axiosClient.patch(`${this.endPoint}/${id}`, { name })
+    const response = await axiosClient.patch(`${this.endPoint}/${id}`, { name });
+    return response.data.response.board;
   }
 }
 
